@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             }}
             else
             {
-                Toast.makeText(getApplicationContext(),"Null division",Toast.LENGTH_LONG)
+                Toast.makeText(getApplicationContext(),"Null division",Toast.LENGTH_LONG).show();
             }
         }
 
