@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 dialogAlertBuilder(result);
             } else if (spinner.getSelectedItem().toString().contains("Minus")) {
                 result = number1.getText().toString() + " - " + number2.getText().toString() + " = " + String.valueOf(n1 - n2);
-                dialogAlertBuilder(result);
+                dialogAlertBuilder(result2);
             } else if (spinner.getSelectedItem().toString().contains("Inmultire")) {
                 result = number1.getText().toString() + " * " + number2.getText().toString() + " = " + String.valueOf(n1 * n2);
                 dialogAlertBuilder(result);

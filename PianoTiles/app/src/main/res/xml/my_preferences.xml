@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <EditTextPreference
+      android:key="PName"
+      android:defaultValue="Player"
+      android:title="Player Name"
+      ></EditTextPreference>
+    <ListPreference
+        android:key="PDifficulty"
+        android:title="Difficulty"
+        android:entries="@array/difficulty_list"
+        android:entryValues="@array/difficulty_list_results"
+
+        ></ListPreference>
+
+
+</PreferenceScreen>
