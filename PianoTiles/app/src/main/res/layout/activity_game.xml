@@ -16,4 +16,12 @@
         android:layout_centerHorizontal="true"
         android:onClick="startGame"
         android:text="Begin" />
+    <com.facebook.share.widget.ShareButton
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/shareButtonFB">
+    </com.facebook.share.widget.ShareButton>
+
+
+
 </RelativeLayout>

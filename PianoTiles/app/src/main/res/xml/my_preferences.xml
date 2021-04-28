@@ -10,8 +10,25 @@
         android:title="Difficulty"
         android:entries="@array/difficulty_list"
         android:entryValues="@array/difficulty_list_results"
-
+        android:defaultValue="0"
         ></ListPreference>
+  <ListPreference
+      android:key="PVibrations"
+      android:title="Vibrations"
+      android:entries="@array/vibration_list"
+      android:entryValues="@array/vibration_list_results"
+      android:defaultValue="0"
+      ></ListPreference>
+
+    <ListPreference
+      android:key="PSound"
+      android:title="Sounds"
+      android:entries="@array/sound_list"
+      android:entryValues="@array/sound_list_results"
+        android:defaultValue="0"
+        ></ListPreference>
+
+
 
 
 </PreferenceScreen>

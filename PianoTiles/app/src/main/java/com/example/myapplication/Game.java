@@ -8,11 +8,13 @@ import androidx.appcompat.view.menu.ActionMenuItemView;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.media.Image;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -31,11 +33,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.login.widget.LoginButton;
+import com.facebook.share.Share;
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -61,6 +71,9 @@ public class Game extends AppCompatActivity {
     private String difficultyName;
     private int difficulty;
     private MediaPlayer b1,b2,b3,b4;
+    private ShareButton shareButton;
+    private LoginButton loginButton;
+    private boolean isLogged=false;
 
     public static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
@@ -106,6 +119,16 @@ public class Game extends AppCompatActivity {
             lastSc=score;
         }
     }
+    private void shareOnFavebook()
+    {
+
+        ShareLinkContent shareLinkContent=new ShareLinkContent.Builder().setContentUrl(Uri.parse("https://www.youtube.com/watch?v=5_kPo8muETo"))
+                .setShareHashtag(new ShareHashtag.Builder().setHashtag("#WhiteTile").build()).
+                        setQuote("I just scored "+ score+" points on " +difficultyName+" difficulty").build();
+
+        shareButton.setShareContent(shareLinkContent);
+        shareButton.callOnClick();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +139,10 @@ public class Game extends AppCompatActivity {
         titleView= (ActionMenuItemView)findViewById(R.id.ScoreId);
         vibe = (Vibrator) Game.this.getSystemService(Context.VIBRATOR_SERVICE);
         sharedPreferences=getSharedPreferences("my_prefs",0);
-        switch (Integer.valueOf(sharedPreferences.getString("PDifficulty","sn")))
+
+        shareButton=findViewById(R.id.shareButtonFB);
+
+        switch (Integer.valueOf(sharedPreferences.getString("PDifficulty","0")))
         {
             case 0:
                 difficultyName="Easy";
@@ -131,6 +157,7 @@ public class Game extends AppCompatActivity {
                 difficulty=2;
                 break;
         }
+
 
 
         if(gameRunning) {
@@ -196,8 +223,27 @@ public class Game extends AppCompatActivity {
         },0,period);
 
     }
-    public void showStats()
+    private void updateScoreList()
     {
+        SharedPreferences sharedPrefs=getSharedPreferences("prefs",0);
+        sharedPreferences=getSharedPreferences("my_prefs",0);
+
+        String v=sharedPreferences.getString("PName","Player")+"\n"+score;
+
+        HashSet<String> mySet = new HashSet<String>(sharedPrefs.getStringSet(difficultyName, new HashSet<String>()));
+        SharedPreferences.Editor editor=sharedPrefs.edit();
+        mySet.add(v);
+        editor.putStringSet(difficultyName,new HashSet<String>(mySet));
+        editor.commit();
+
+
+
+
+    }
+    private void showStats()
+    {
+
+        updateScoreList();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Results:");
         String message="Player:"+sharedPreferences.getString("PName","Player")+"\n"+"Difficulty:"+difficultyName+"\nScore:"+score;
@@ -207,11 +253,17 @@ public class Game extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {  }
         });
+        SharedPreferences sharedPreferences=getSharedPreferences("prefs",0);
 
+
+        if(sharedPreferences.getBoolean("isLogged",false)==true){
         builder.setNeutralButton("Share", new DialogInterface.OnClickListener() {
         @Override
-        public void onClick(DialogInterface dialog, int which) {  }
-    });
+        public void onClick(DialogInterface dialog, int which) {
+            shareOnFavebook();
+        }
+       });}
+
     AlertDialog alertDialog = builder.create();
 alertDialog.show();
 
@@ -239,7 +291,12 @@ alertDialog.show();
                 boolean quit=false;
                 for (ImageView imageView : imageViewList) {
                     imageView.setY(imageView.getY() + speed);
-                    if(quit) break;
+                    if(quit)
+                    {
+                     imageViewList=new ArrayList<>();
+                     break;
+                    }
+
                     if (imageView.getY() > getScreenHeight()) {
 
                         if(imageView.getMinimumHeight()==0) {
@@ -367,6 +424,20 @@ alertDialog.show();
 
 
     }
+    private boolean checkIfVibrations()
+    {
+        SharedPreferences sharedPreferences=getSharedPreferences("my_prefs",0);
+        if(Integer.valueOf(sharedPreferences.getString("PVibrations","0"))==1)
+            return true;
+        return false;
+    }
+    private boolean checkIfSounds()
+    {
+        SharedPreferences sharedPreferences=getSharedPreferences("my_prefs",0);
+        if(Integer.valueOf(sharedPreferences.getString("PSound","0"))==1)
+            return true;
+        return false;
+    }
 
     private void onTileClick(View view,boolean black)
     {
@@ -375,6 +446,7 @@ alertDialog.show();
 
                 relativeLayout.removeView(view);
                 imageViewList.remove(view);
+                if(checkIfVibrations())
                 vibe.vibrate(25);
                 updateScore = true;
                 /*
@@ -385,8 +457,10 @@ alertDialog.show();
                 if(r==2)b3.start();
                 if(r==3)b4.start();
                  */
-                b3.start();
+                if(checkIfSounds()) {
+                    b3.start();
 
+                }
 
             } else {
                 System.out.println("aici");
@@ -411,10 +485,6 @@ alertDialog.show();
 
 
 
-    public void makeToast()
-    {
-        Log.d("wtf",Double.toString(getScreenWidth()));
-    }
 
     public void disableTouchListeners()
     {
