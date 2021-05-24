@@ -25,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ActionMenuView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -84,7 +85,7 @@ public class Game extends AppCompatActivity {
     }
     private void initDifficulty()
     {
-        System.out.println("diff is"+difficulty);
+
 
         if(difficulty==0)
         {
@@ -107,7 +108,7 @@ public class Game extends AppCompatActivity {
     }
     private void increaseDifficulty()
     {
-        System.out.println(speed);
+
         if(score-lastSc>25)
         {
             if(speed<=17)
@@ -139,7 +140,6 @@ public class Game extends AppCompatActivity {
         titleView= (ActionMenuItemView)findViewById(R.id.ScoreId);
         vibe = (Vibrator) Game.this.getSystemService(Context.VIBRATOR_SERVICE);
         sharedPreferences=getSharedPreferences("my_prefs",0);
-
         shareButton=findViewById(R.id.shareButtonFB);
 
         switch (Integer.valueOf(sharedPreferences.getString("PDifficulty","0")))
@@ -173,10 +173,7 @@ public class Game extends AppCompatActivity {
         initDifficulty();
         imageViewList=new ArrayList<>();
         availablePositions=new ArrayList<>();
-        b1 = MediaPlayer.create(getApplicationContext(), R.raw.b1);
-        b2=MediaPlayer.create(getApplicationContext(),R.raw.b2);
         b3=MediaPlayer.create(getApplicationContext(),R.raw.b3);
-        b4=MediaPlayer.create(getApplicationContext(),R.raw.b4);
 
         titleView = findViewById(R.id.ScoreId);
         titleView.setTitle("Score:" + Integer.toString(score));
@@ -245,9 +242,8 @@ public class Game extends AppCompatActivity {
 
         updateScoreList();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Results:");
+        builder.setTitle("Results");
         String message="Player:"+sharedPreferences.getString("PName","Player")+"\n"+"Difficulty:"+difficultyName+"\nScore:"+score;
-        System.out.println(sharedPreferences.getString("PDifficulty","sn"));
         builder.setMessage(message);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
@@ -265,7 +261,14 @@ public class Game extends AppCompatActivity {
        });}
 
     AlertDialog alertDialog = builder.create();
-alertDialog.show();
+        try {
+            alertDialog.show();
+        }
+        catch (WindowManager.BadTokenException e)
+        {
+            e.printStackTrace();
+        }
+
 
 
     }
@@ -284,7 +287,6 @@ alertDialog.show();
 
             if(speed<backupSpeed) {
                 speed += 0.05;
-                System.out.println(speed);
             }
             if(imageViewList!=null) {
 
@@ -320,7 +322,7 @@ alertDialog.show();
     private void pickNextTileToDraw()
     {
 
-        Random rd = new Random(); // creating Random object
+        Random rd = new Random();
         boolean run=true;
         while (run) {
             int rnd = Math.abs(rd.nextInt()) % 4;
@@ -449,21 +451,13 @@ alertDialog.show();
                 if(checkIfVibrations())
                 vibe.vibrate(25);
                 updateScore = true;
-                /*
-                Random rnd=new Random();
-                int r = Math.abs(rnd.nextInt()) % 4;
-                if(r==0)b1.start();
-                if(r==1)b2.start();
-                if(r==2)b3.start();
-                if(r==3)b4.start();
-                 */
+
                 if(checkIfSounds()) {
                     b3.start();
 
                 }
 
             } else {
-                System.out.println("aici");
                 resetGame();
                 showStats();
 
@@ -482,22 +476,6 @@ alertDialog.show();
         relativeLayout.addView(imageView);
     }
 
-
-
-
-
-    public void disableTouchListeners()
-    {
-        for (ImageView imageView:imageViewList)
-        {
-            imageView.setOnTouchListener(null);
-            imageView.setOnClickListener(null);
-            imageView.setOnGenericMotionListener(null);
-            imageView.setOnHoverListener(null);
-            imageView.setOnLongClickListener(null);
-            imageView.setOnDragListener(null);
-        }
-    }
 
     public void pauseGame(MenuItem item) {
         if(!paused)

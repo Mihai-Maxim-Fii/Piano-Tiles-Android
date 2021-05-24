@@ -51,7 +51,6 @@ public class Score extends AppCompatActivity {
 
     public void displayScore(View view) {
         ArrayList<String> toShow=new ArrayList<>();
-        System.out.println(Arrays.toString(arr1));
         if(spinner.getSelectedItem().toString().contains("Easy"))
         {
             for(String s:arr1)

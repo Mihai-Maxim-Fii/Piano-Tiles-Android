@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar_layout);
 
-
+        System.out.println("da,merge");
         callbackManager = CallbackManager.Factory.create();
         fbImageView=findViewById(R.id.fbimage);
         loginButton=findViewById(R.id.login_button);
@@ -62,24 +62,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
-                System.out.println("Success");
+
             }
 
             @Override
             public void onCancel() {
 
-                System.out.println("Cancel");
+
             }
 
             @Override
             public void onError(FacebookException error) {
 
-                System.out.println("Err");
+
             }
         });
     }
     private void initScoreBoards()
     {
+
+
 
         SharedPreferences sharedPreferences=getSharedPreferences("prefs",0);
         SharedPreferences.Editor editor=sharedPreferences.edit();
@@ -87,13 +89,10 @@ public class MainActivity extends AppCompatActivity {
         Set<String> initSet=new HashSet<>();
         initSet.add("init"+"\n"+"-1");
 
-        System.out.println(sharedPreferences.getString("pic","wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"));
 
         if(sharedPreferences.getStringSet("Easy",null)==null)
         {
             editor.putStringSet("Easy",initSet);
-
-
         }
         if(sharedPreferences.getStringSet("Medium",null)==null)
         {
@@ -126,9 +125,9 @@ public class MainActivity extends AppCompatActivity {
         GraphRequest graphRequest=GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
-                Log.d("Dem",object.toString());
-                isLogged=true;
-                updateLogStatus();
+
+
+
                 try {
 
                     String id=object.getString("id");
@@ -138,11 +137,21 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString("pic",pic);
                     editor.commit();
                     Picasso.get().load(sharedPreferences.getString("pic","")).into(fbImageView);
+                    isLogged=true;
+                    updateLogStatus();
 
                 }
                 catch (JSONException e)
                 {
                     e.printStackTrace();
+                    isLogged=false;
+                    updateLogStatus();
+                }
+                catch (NullPointerException e)
+                {
+                    e.printStackTrace();
+                    isLogged=false;
+                    updateLogStatus();
                 }
             }
         });
@@ -208,8 +217,10 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         fbImageView=findViewById(R.id.fbimage);
         SharedPreferences sharedPreferences=getSharedPreferences("prefs",0);
-        if(sharedPreferences.getString("pic","")!="")
-            Picasso.get().load(sharedPreferences.getString("pic","")).into(fbImageView);
+        if(!sharedPreferences.getString("pic","").contains("")) {
+
+            Picasso.get().load(sharedPreferences.getString("pic", "")).into(fbImageView);
+        }
     }
 
 
@@ -220,23 +231,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void showScore(View view) {
         SharedPreferences sharedPreferences=getSharedPreferences("prefs",0);
-        if(sharedPreferences.getStringSet("Easy",null)==null)
+        if((sharedPreferences.getStringSet("Easy",null)==null)||
+                (sharedPreferences.getStringSet("Medium",null)==null)||
+                sharedPreferences.getStringSet("Hard",null)==null)
             initScoreBoards();
 
-        for(String s:sharedPreferences.getStringSet("Easy",null))
-        {
-            System.out.println(s);
-        }
-        System.out.println("###################");
-        for(String s:sharedPreferences.getStringSet("Medium",null))
-        {
-            System.out.println(s);
-        }
-        System.out.println("###################");
-        for(String s:sharedPreferences.getStringSet("Hard",null))
-        {
-            System.out.println(s);
-        }
+
 
 
         Set<String> s1=sharedPreferences.getStringSet("Easy",null);
